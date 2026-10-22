@@ -1,0 +1,16 @@
+# data and large outputs
+data/*
+!data/.gitkeep
+*.las
+*.laz
+*.copc.laz
+*.tif
+*.tiff
+*.h5
+*.gpkg
+
+# R / notebooks
+.Rhistory
+.RData
+.Rproj.user/
+.ipynb_checkpoints/
