@@ -14,7 +14,10 @@ tnm_lpc_products <- function(bbox, page = 500) {
     items <- j$items
     if (is.null(items) || NROW(items) == 0) break
     cols <- intersect(c("title", "publicationDate", "sizeInBytes", "downloadURL"), names(items))
-    out[[length(out) + 1]] <- tibble::as_tibble(items[, cols, drop = FALSE])
+    df <- tibble::as_tibble(items[, cols, drop = FALSE])
+    bb <- items$boundingBox
+    if (is.data.frame(bb)) df <- dplyr::bind_cols(df, tibble::as_tibble(bb[, c("minX", "minY", "maxX", "maxY")]))
+    out[[length(out) + 1]] <- df
     offset <- offset + NROW(items)
     if (offset >= (j$total %||% 0)) break
   }
@@ -25,6 +28,14 @@ tnm_lpc_products <- function(bbox, page = 500) {
       workunit = stringr::str_match(downloadURL, "Projects/[^/]+/([^/]+)/")[, 2],
       year     = as.integer(stringr::str_extract(dplyr::coalesce(workunit, project), "(19|20)\\d{2}"))
     )
+}
+
+# TNM tiles as sf polygons (lon/lat bounding boxes), transformed to the working CRS.
+tnm_tiles_sf <- function(tnm, crs = CRS_EPSG) {
+  geom <- sf::st_sfc(lapply(seq_len(nrow(tnm)), function(i)
+    sf::st_as_sfc(sf::st_bbox(c(xmin = tnm$minX[i], ymin = tnm$minY[i],
+                                xmax = tnm$maxX[i], ymax = tnm$maxY[i]), crs = 4326))[[1]]), crs = 4326)
+  sf::st_transform(sf::st_sf(tnm, geometry = geom), crs)
 }
 
 # --- Planetary Computer: 3DEP COPC tiles (footprints + point counts) ----------------
