@@ -57,8 +57,8 @@ pc_copc_items <- function(bbox, crs = CRS_EPSG) {
   dplyr::left_join(g, props, by = "id") |>
     sf::st_transform(crs) |>
     dplyr::mutate(
-      project  = sub("_[^_]+$", "", id),               # drop trailing tile code
-      year     = as.integer(stringr::str_extract(id, "(19|20)\\d{2}")),
+      project  = stringr::str_extract(id, "^.*?_(19|20)\\d{2}"),  # e.g. USGS_LPC_WA_Western_North_2016
+      year     = as.integer(stringr::str_extract(project, "(19|20)\\d{2}$")),
       area_m2  = as.numeric(sf::st_area(geometry)),
       pts_m2   = count / area_m2                        # all returns; footprint may include no-data
     )
