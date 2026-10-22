@@ -46,12 +46,13 @@ pc_copc_items <- function(bbox, crs = CRS_EPSG) {
       epsg  = as.integer(p[["proj:epsg"]] %||% NA)
     )
   })
-  # Write geometries as GeoJSON so sf parses them without extra packages.
-  fc <- list(type = "FeatureCollection", features = lapply(feats, function(f)
-    list(type = "Feature", properties = list(id = f$id), geometry = f$geometry)))
-  tf <- tempfile(fileext = ".geojson")
-  writeLines(jsonlite::toJSON(fc, auto_unbox = TRUE, digits = NA), tf)
-  g <- sf::st_read(tf, quiet = TRUE)
+  # Footprint = each item's lon/lat bbox (tiles are rectangles; avoids GeoJSON
+  # round-trip that collapsed single-ring polygons).
+  geom <- sf::st_sfc(lapply(feats, function(f) {
+    b <- unlist(f$bbox)[c(1, 2, length(unlist(f$bbox)) / 2 + 1, length(unlist(f$bbox)) / 2 + 2)]
+    sf::st_as_sfc(sf::st_bbox(c(xmin = b[1], ymin = b[2], xmax = b[3], ymax = b[4]), crs = 4326))[[1]]
+  }), crs = 4326)
+  g <- sf::st_sf(id = vapply(feats, `[[`, "", "id"), geometry = geom)
 
   dplyr::left_join(g, props, by = "id") |>
     sf::st_transform(crs) |>
