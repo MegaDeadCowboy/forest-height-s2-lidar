@@ -25,6 +25,10 @@ load_aoi <- function(bbox, pattern = "Whatcom", crs = CRS_EPSG) {
     return(list(aoi = sf::st_transform(aoi, crs), huc12 = huc))
   }
   keep <- huc[grepl(pattern, huc$name, ignore.case = TRUE), ]
-  aoi <- sf::st_union(sf::st_make_valid(keep))
-  list(aoi = sf::st_transform(aoi, crs), huc12 = huc, selected = keep)
+  # Project first, then repair/union with planar GEOS. Doing this in lon/lat runs
+  # through s2, which can flip ring orientation on ArcGIS GeoJSON.
+  keep_p <- sf::st_transform(keep, crs)
+  aoi <- sf::st_union(sf::st_make_valid(keep_p))
+  aoi <- sf::st_cast(sf::st_make_valid(aoi), "MULTIPOLYGON")
+  list(aoi = aoi, huc12 = huc, selected = keep)
 }
