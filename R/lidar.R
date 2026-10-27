@@ -8,8 +8,17 @@ fetch_portal_las <- function(url, dest_dir) {
   dir.create(dest_dir, recursive = TRUE, showWarnings = FALSE)
   zf <- file.path(dest_dir, "download.zip")
   if (!file.exists(zf)) {
-    options(timeout = 3600)
-    utils::download.file(url, zf, mode = "wb", quiet = TRUE)
+    resp <- httr2::request(url) |>
+      httr2::req_user_agent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124 Safari/537.36") |>
+      httr2::req_timeout(3600) |>
+      httr2::req_error(is_error = function(r) FALSE) |>
+      httr2::req_perform(path = zf)
+    if (httr2::resp_status(resp) >= 400) {
+      body <- tryCatch(paste(readLines(zf, warn = FALSE), collapse = "\n"), error = function(e) "")
+      file.remove(zf)
+      stop("Portal returned HTTP ", httr2::resp_status(resp), ": ", substr(body, 1, 500),
+           "\nFallback: download the box in your browser and upload the zip to ", zf)
+    }
   }
   sig <- readBin(zf, "raw", 4)
   if (!identical(sig[1:2], as.raw(c(0x50, 0x4b)))) {
