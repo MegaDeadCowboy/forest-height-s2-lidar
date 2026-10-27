@@ -34,13 +34,16 @@ fetch_portal_las <- function(url, dest_dir) {
     if (!is.null(st) && st > 1) stop("unzip failed on ", basename(z), " (status ", st, "):\n", paste(out, collapse = "\n"))
   }
   sys_unzip(zf, dest_dir)
-  repeat {  # nested zips
-    inner <- setdiff(list.files(dest_dir, "\\.zip$", recursive = TRUE, full.names = TRUE), zf)
-    inner <- inner[!file.exists(paste0(inner, ".done"))]
-    if (!length(inner)) break
-    for (z in inner) { sys_unzip(z, dirname(z)); file.create(paste0(z, ".done")) }
+  # Nested zips: extract in place with the shell, then delete them (up to 3 levels).
+  for (i in 1:3) {
+    cmd <- sprintf("cd %s && find . -type f -iname '*.zip' ! -path './download.zip' -print -exec sh -c 'unzip -oq \"$1\" -d \"$(dirname \"$1\")\" && rm \"$1\"' _ {} \\;",
+                   shQuote(dest_dir))
+    done <- system(cmd, intern = TRUE)
+    if (!length(done)) break
+    message("Extracted nested: ", paste(basename(done), collapse = ", "))
   }
-  list.files(dest_dir, "\\.(las|laz)$", recursive = TRUE, full.names = TRUE, ignore.case = TRUE)
+  las <- list.files(dest_dir, "\\.(las|laz)$", recursive = TRUE, full.names = TRUE, ignore.case = TRUE)
+  las[!is.na(las)]
 }
 
 # LAS 1.4 adjusted standard GPS time -> UTC POSIXct. Returns NA if GPS week time.
