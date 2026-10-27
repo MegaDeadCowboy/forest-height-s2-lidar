@@ -26,12 +26,19 @@ fetch_portal_las <- function(url, dest_dir) {
     file.remove(zf)
     stop("Portal did not return a zip (link expired or needs a browser session?). First bytes:\n", txt)
   }
-  utils::unzip(zf, exdir = dest_dir)
+  # System unzip handles zip64 / large members that utils::unzip chokes on.
+  sys_unzip <- function(z, exdir) {
+    dir.create(exdir, recursive = TRUE, showWarnings = FALSE)
+    out <- system2("unzip", c("-oq", shQuote(z), "-d", shQuote(exdir)), stdout = TRUE, stderr = TRUE)
+    st <- attr(out, "status")
+    if (!is.null(st) && st > 1) stop("unzip failed on ", basename(z), " (status ", st, "):\n", paste(out, collapse = "\n"))
+  }
+  sys_unzip(zf, dest_dir)
   repeat {  # nested zips
     inner <- setdiff(list.files(dest_dir, "\\.zip$", recursive = TRUE, full.names = TRUE), zf)
     inner <- inner[!file.exists(paste0(inner, ".done"))]
     if (!length(inner)) break
-    for (z in inner) { utils::unzip(z, exdir = dirname(z)); file.create(paste0(z, ".done")) }
+    for (z in inner) { sys_unzip(z, dirname(z)); file.create(paste0(z, ".done")) }
   }
   list.files(dest_dir, "\\.(las|laz)$", recursive = TRUE, full.names = TRUE, ignore.case = TRUE)
 }
