@@ -88,7 +88,7 @@ Check LiDAR coverage, year, density and GEDI shot counts. Pick the study area an
 
 ## Repo layout
 ```
-forest-height-s2-lidar/      (name TBD)
+forest-height-s2-lidar/
   notebooks/  00_coverage · 01_lidar_core · 02_gedi_validation · 03_s2_model · 04_map · 05_riparian · 06_stretch
   R/          shared functions (src/ too if Python is used)
   figures/    maps, charts, and the CSVs behind every number
@@ -116,7 +116,7 @@ forest-height-s2-lidar/      (name TBD)
 - **Scope creep:** finish each phase before starting the next.
 
 ## Open decisions
-1. Study area and LiDAR acquisition (Phase 0).
+1. ~~Study area and LiDAR acquisition (Phase 0).~~ Decided 2026-10-27 (see log); Cascades North 2023 specs pending from LAS headers in 01.
 2. Stay in R for S2 and modeling (rstac/gdalcubes, ranger/xgboost, spatial CV packages) vs switch to Python (odc-stac, scikit-learn, LightGBM). R keeps one runtime and closes the R gap; Python fits the AI4EO track.
 3. Planetary Computer vs Earth Engine for Sentinel-2.
 
@@ -138,3 +138,9 @@ Resume convention: give the project a real end date once it's done. Only active 
 - 2026-10-14: Validation reference is GEDI, not FIA — public FIA plot coordinates are offset for privacy, so they can't match 1 m CHM pixels.
 - 2026-10-22: Merged the riparian LiDAR and Sentinel-2 canopy-height briefs into one project — LiDAR core is shared, S2 scope is broader and serves CDE and jobs, deadline moves to before Christmas (hard: mid-Jan 2027).
 - 2026-10-22: Step 0 requires LiDAR flown 2019 or later — GEDI starts Apr 2019 and S2 composite must be within ~3 years (verify).
+- 2026-10-22: Repo = `forest-height-s2-lidar` (github.com/MegaDeadCowboy/forest-height-s2-lidar); working CRS EPSG:32610 (WGS 84 / UTM 10N) — matches the native Sentinel-2 grid; LiDAR reprojected from native CRS in 01.
+- 2026-10-27: AOI = Lake Whatcom + Whatcom Creek HUC12s (USGS WBD, 170.4 km²) — the lake and its outlet; ties to the salmon-monitoring repo.
+- 2026-10-27: 3DEP `WA_Western_WA_QL1_LiDAR_2016_B16` not used — 0 of its 155 tiles in the search box intersect the AOI (tiles surround the watershed).
+- 2026-10-27: Bellingham 2013 not used — covers the watershed but fails the ≥2019 rule.
+- 2026-10-27: LiDAR = WA DNR **Cascades North 2023** (west AOI, main lake, Whatcom Creek) + **Acme Valley Refresh23 2024** (Smith Ck / south-basin strip) — both ≥2019, together cover the AOI on the portal hillshade. Acme Valley per WGS QA + NV5 report: flown 2023-07-28, 2023-09-22, 2024-02-04 (low elevations leaf-off, Feb 2024); 11.0 first-return / 4.9 ground pts/m²; WA State Plane South, NAD83(HARN), NAVD88 Geoid18, US survey ft; LAS 1.4. Cascades North specs (dates, density, CRS) to be read from LAS headers in 01 (verify).
+- 2026-10-27: Leaf-off risk — low-elevation tiles flown in winter will under-read deciduous (alder/maple) riparian canopy cover; per-tile flight dates from GPS time decide where this applies.
