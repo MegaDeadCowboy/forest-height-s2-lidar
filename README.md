@@ -12,6 +12,7 @@ Full scope, methods and decision log: [`docs/project_brief.md`](docs/project_bri
 |---|---|---|
 | `00_coverage` | Study area, LiDAR acquisition, GEDI availability, CRS | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/MegaDeadCowboy/forest-height-s2-lidar/blob/main/notebooks/00_coverage.ipynb) |
 | `01_lidar_core` | Ground, DTM, 1 m CHM, metrics, trees (test tile) | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/MegaDeadCowboy/forest-height-s2-lidar/blob/main/notebooks/01_lidar_core.ipynb) |
+| `01b_tile_plan` | Which DNR tiles to download (training sample + stream tiles) | [![Open in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/MegaDeadCowboy/forest-height-s2-lidar/blob/main/notebooks/01b_tile_plan.ipynb) |
 | `02_gedi_validation` | CHM vs GEDI RH98 | — |
 | `03_s2_model` | Sentinel-2 composite, model, spatial CV | — |
 | `04_map` | Wall-to-wall map + area of applicability | — |

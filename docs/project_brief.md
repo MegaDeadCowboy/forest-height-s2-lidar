@@ -89,7 +89,7 @@ Check LiDAR coverage, year, density and GEDI shot counts. Pick the study area an
 ## Repo layout
 ```
 forest-height-s2-lidar/
-  notebooks/  00_coverage · 01_lidar_core · 02_gedi_validation · 03_s2_model · 04_map · 05_riparian · 06_stretch
+  notebooks/  00_coverage · 01_lidar_core · 01b_tile_plan · 02_gedi_validation · 03_s2_model · 04_map · 05_riparian · 06_stretch
   R/          shared functions (src/ too if Python is used)
   figures/    maps, charts, and the CSVs behind every number
   docs/project_brief.md
@@ -147,3 +147,6 @@ Resume convention: give the project a real end date once it's done. Only active 
 - 2026-10-27: DNR portal blocks scripted downloads from Colab (HTTP 403) — test tile downloaded in browser and uploaded; full-AOI access method still open.
 - 2026-10-27: Cascades North 2023 test tile (lower Whatcom Creek, 1 DNR tile, 0.47 km²) read from LAS: flown 2022-12-12 (100% of points, leaf-off), NV5, LAZ/LAS 1.4, WA State Plane South NAD83(HARN) + NAVD88 Geoid18 US ft (no single EPSG; compound WKT), 25.1 all / 12.6 first / 3.3 ground pts/m², classes 1 and 2 only after dropping withheld. Reprojected to EPSG:32610 with Z ×0.3048006.
 - 2026-10-27: Test-tile CHM (1 m pit-free): median 19.8 m, max 62.6 m; 12 normalized points < −1 m dropped, none > 90 m; 7,233 tree tops ≥5 m over 46.94 ha (154 stems/ha, untuned window).
+- 2026-10-27: Primary LiDAR target = p95 height; canopy cover secondary with leaf-off caveat (Cascades North flown 2022-12-12) — add S2 summer–winter NDVI hardwood mask to stratify cover in Phases 3 and 5.
+- 2026-10-27: Non-forest masked, not reclassified — DNR delivers only classes 1/2, so buildings/tanks/wires sit in class 1 (seen in test CHM); OSM buildings + tanks (+2 m) masked from CHM before tree detection; ESA WorldCover tree share (`tree_frac`) carried on 10/20 m metric cells for filtering.
+- 2026-10-27: Full-AOI LiDAR = sampled tiles, not wall-to-wall — portal blocks scripted download (403) and no 3DEP/OpenTopography mirror found; 01b picks 4 elevation strata × 12 forested training tiles + every tile touching a 100 m buffer of NHD perennial streams (proxy for fish-bearing until DNR water types in Phase 5). Tile grid rebuilt from DNR naming (WA SP South ft, 2250 ft tiles; verify on a second tile).
