@@ -4,7 +4,7 @@ Airborne LiDAR, validated against NASA GEDI, as ground truth for a Sentinel-2 mo
 
 > **Status:** Phase 1 (LiDAR core) — test tile. Results will appear here only once they come from a completed run.
 
-Full scope, methods and decision log: [`docs/project_brief.md`](docs/project_brief.md).
+Full scope, methods and decision log: [`docs/project_brief.md`](docs/project_brief.md). Current status and next steps: [`docs/status.md`](docs/status.md).
 
 ## Run order
 

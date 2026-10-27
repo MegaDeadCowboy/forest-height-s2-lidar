@@ -92,7 +92,7 @@ forest-height-s2-lidar/
   notebooks/  00_coverage · 01_lidar_core · 01b_tile_plan · 02_gedi_validation · 03_s2_model · 04_map · 05_riparian · 06_stretch
   R/          shared functions (src/ too if Python is used)
   figures/    maps, charts, and the CSVs behind every number
-  docs/project_brief.md
+  docs/project_brief.md · docs/status.md (handoff)
   README.md
   environment file
 ```
